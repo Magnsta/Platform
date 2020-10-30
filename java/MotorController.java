@@ -38,8 +38,8 @@ public class MotorController implements Runnable {
       System.out.println(axie.name() + "   " + value);
       gain = pid.calculatePID(value, 0);
       System.out.println("PID gain = "+gain);
-      motorRotation = getRotations(gain);
-      box.setAxies(axie, motorRotation);
+      //motorRotation = getRotations(gain);
+      box.setAxies(axie, gain);
       //System.out.println(axie.name() + "--> system gain is : " + gain + " angle is : " + value + " motor is rotated " + motorRotation / Math.PI + "*PI degrees");
       //System.out.println("motor_1: " + box.getMotor1() + " ||  motor_2: " + box.getMotor2() + "  ||  motor_3: " + box.getMotor3());
       recived = false;

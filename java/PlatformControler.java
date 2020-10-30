@@ -26,7 +26,6 @@ public class PlatformControler {
     // initialize io reader:
 
     Broadcast broadcaster = new Broadcast(3,box);
-    //TODO: add accelerometer
     Gyroscope IOReadingThread = new Gyroscope(broadcaster);
     // initialize consumer threads
     MotorController Xcalculator = new MotorController(XPID, broadcaster, Axies.X, box);
