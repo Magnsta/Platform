@@ -1,22 +1,34 @@
+import java.io.IOException;
 import java.util.InputMismatchException;
 
 public class Gyroscope implements Runnable {
+  private static long readFrec;
   private double Xangle;
   private double Yangle;
   private double height;
   private double[] angles;
   private Broadcast broadcaster;
-  public Gyroscope(Broadcast broadcaster) {
+  private SerialCom ser;
+
+  public Gyroscope(Broadcast broadcaster, long readFreq, String tty)  {
     this.Xangle = 0;
     this.Yangle = 0;
     this.height = 0;
     this.broadcaster = broadcaster;
-
+    this.readFrec = readFreq;
     angles = new double[3];
+    try{
+    ser = new SerialCom(tty, 9600);}catch (IOException IOe){
+      System.out.println(IOe.getMessage());
+
+      //TODO:Stopp system could Not Connect
+      // }
+
   }
 
-  public void run() {
+  public void run(){
     while (true) {
+      updateAngles();
       broadcastAngles();
     }
   }
@@ -33,18 +45,21 @@ public class Gyroscope implements Runnable {
     }
   }
 
+  private void updateAngles() {
+    try {
+
+      //TODO: read an update angles properly
+      ser.read();
+    } catch (IOException IOe) {
+      //TODO: stop system and go to alarm
+    }
+  }
+
   private void broadcastAngles() {
-    //read angles:
-    // TODO: implement Angle reading
-    setAngles();
+
     System.out.println("angles of the gyroscope" + angles[0] + " || " + angles[1]);
     broadcaster.send(angles);
-    broadcaster.awaitTimed(100);
+    broadcaster.awaitTimed(readFrec);
   }
-  private void setAngles(){
 
-    angles[0] = Xangle += (Math.random()-0.4)*1.1;
-    angles[1] = Yangle += (Math.random()-0.6)*1.1;
-    angles[2] = height += (Math.random()-0.6)*1.1;
-  }
 }

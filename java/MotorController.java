@@ -5,46 +5,50 @@ public class MotorController implements Runnable {
   private boolean recived;
   private Axies axie;
   private StorageBox box;
+  private int maxEnc; //maximum encoder value
+  private int minEnc; // minimum encoder value
 
-  public MotorController(PID pid, Broadcast broadcaster, Axies axie, StorageBox box) {
-    this.pid = pid;
+  public MotorController( Broadcast broadcaster, Axies axie, StorageBox box) {
     this.axie = axie;
     this.broadcaster = broadcaster;
     this.box = box;
     this.recived = true;
 
   }
-
   private double getRotations(double angle) {
     double returnvalue = 0;
     if (PlatformControler.PI / 2 > Math.abs(angle)) {
       returnvalue = Math.asin(PlatformControler.ANGLE_CONSTANT * angle);
-    }
-    else if (angle >= 0) returnvalue = PlatformControler.MAX_ANGLE;
+    } else if (angle >= 0) returnvalue = PlatformControler.MAX_ANGLE;
     else returnvalue = -PlatformControler.MAX_ANGLE;
     return returnvalue;
   }
 
+  /**
+   * waits for new angles from the gyro then sends the angles to the storage box.
+   */
   public void run() {
-    double value;
-    double gain;
-    double motorRotation;
+    double newAngle;
     while (true) {
       while (!recived) {
         broadcaster.await();
         recived = true;
       }
-      value = broadcaster.recive(axie);
-      System.out.println(axie.name() + "   " + value);
-      gain = pid.calculatePID(value, 0);
-      System.out.println("PID gain = "+gain);
-      //motorRotation = getRotations(gain);
-      box.setAxies(axie, gain);
-      //System.out.println(axie.name() + "--> system gain is : " + gain + " angle is : " + value + " motor is rotated " + motorRotation / Math.PI + "*PI degrees");
-      //System.out.println("motor_1: " + box.getMotor1() + " ||  motor_2: " + box.getMotor2() + "  ||  motor_3: " + box.getMotor3());
+      // calculates the angle we want the motor to change to...
+      newAngle = calculateMotorAngle(broadcaster.recive(axie));
+      box.setAxies(axie, newAngle);
       recived = false;
-
     }
+  }
+
+  /**
+   * returns the angle of the motor given the current encoder value
+   *
+   * @param encoderValue the encoder value.
+   * @return angle of the motor
+   */
+  private double calculateMotorAngle(double encoderValue) {
+    return (encoderValue - minEnc) / maxEnc * PlatformControler.PI;
   }
 
 }

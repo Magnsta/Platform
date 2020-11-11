@@ -4,10 +4,10 @@ public class PlatformControler {
   static public double PI = Math.PI;
 
   // platform constants
-  static public double PLATFORM_LENGTH = 10; //platform length in cm.
-  static public double ARM_LENGTH = 5;       //arm length in cm.
-  static public double ANGLE_CONSTANT = PLATFORM_LENGTH / (ARM_LENGTH * 4);
-  static public double MAX_ANGLE = Math.asin(ANGLE_CONSTANT * Math.sin(PI / 2));
+  static final public double PLATFORM_LENGTH = 10; //platform length in cm.
+  static final public double ARM_LENGTH = 5;       //arm length in cm.
+  static final public double ANGLE_CONSTANT = PLATFORM_LENGTH / (ARM_LENGTH * 4);
+  static final public double MAX_ANGLE = Math.asin(ANGLE_CONSTANT * Math.sin(PI / 2));
 
   /**
    * runs the program
@@ -19,23 +19,26 @@ public class PlatformControler {
     double i = 0.000001;
     double d = 0.0001;
     StorageBox box = new StorageBox();
-    // initialize pids for axies
-    PID XPID = new PID(p, i, d);
-    PID YPID = new PID(p, i, d);
-    PID ZPID = new PID(p, i, d);
+
+    //TODO: add startup for system
+
+
     // initialize io reader:
 
     Broadcast broadcaster = new Broadcast(3,box);
-    Gyroscope IOReadingThread = new Gyroscope(broadcaster);
+    Gyroscope IOReadingThread = new Gyroscope(broadcaster,10);
     // initialize consumer threads
-    MotorController Xcalculator = new MotorController(XPID, broadcaster, Axies.X, box);
-    MotorController Ycalculator = new MotorController(YPID, broadcaster, Axies.Y, box);
-    MotorController Zcalculator = new MotorController(ZPID, broadcaster, Axies.Z, box);
+    MotorController Xcalculator = new MotorController(broadcaster, Axies.X, box);
+    MotorController Ycalculator = new MotorController(broadcaster, Axies.Y, box);
+    MotorController Zcalculator = new MotorController(broadcaster, Axies.Z, box);
+    // initialise writer
+
 
     Thread thread1 = new Thread(IOReadingThread);
     Thread thread2 = new Thread(Xcalculator);
     Thread thread3 = new Thread(Ycalculator);
     Thread thread4 = new Thread(Zcalculator);
+    Thread thread5 = new Thread();
     // start Threads
     thread1.start();
     thread2.start();
