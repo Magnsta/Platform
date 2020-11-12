@@ -18,12 +18,6 @@ public class Broadcast {
     boolean sent = false;
     if ((waiting >= 1) && (!arrived)) {
 
-      box.setAxies(Axies.X,sendMessage[0]);
-
-      box.setAxies(Axies.Y,sendMessage[1]);
-
-      box.setAxies(Axies.Z,sendMessage[2]);
-
       arrived = true;
       this.notifyAll();
       sent = true;

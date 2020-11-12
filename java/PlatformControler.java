@@ -1,7 +1,7 @@
 public class PlatformControler {
   //static math classes
 
-  static public double PI = Math.PI;
+  static final public double PI = Math.PI;
 
   // platform constants
   static final public double PLATFORM_LENGTH = 10; //platform length in cm.
@@ -15,9 +15,6 @@ public class PlatformControler {
    * @param args
    */
   public static void main(String[] args) {
-    double p = 0.01;
-    double i = 0.000001;
-    double d = 0.0001;
     StorageBox box = new StorageBox();
 
     //TODO: add startup for system
@@ -26,7 +23,7 @@ public class PlatformControler {
     // initialize io reader:
 
     Broadcast broadcaster = new Broadcast(3,box);
-    Gyroscope IOReadingThread = new Gyroscope(broadcaster,10);
+    Gyroscope IOReadingThread = new Gyroscope(broadcaster,10,"/dev/ttyUSB0");
     // initialize consumer threads
     MotorController Xcalculator = new MotorController(broadcaster, Axies.X, box);
     MotorController Ycalculator = new MotorController(broadcaster, Axies.Y, box);
