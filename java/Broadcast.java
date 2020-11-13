@@ -17,7 +17,7 @@ public class Broadcast {
   public synchronized boolean send(double[] sendMessage) {
     boolean sent = false;
     if ((waiting >= 1) && (!arrived)) {
-
+      box.setAxies(sendMessage);
       arrived = true;
       this.notifyAll();
       sent = true;

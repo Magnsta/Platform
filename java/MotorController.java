@@ -30,7 +30,7 @@ public class MotorController implements Runnable {
    */
   public void run() {
     double newAngle;
-    while (true) {
+    while (!Thread.interrupted()) {
       while (!recived) {
         broadcaster.await();
         recived = true;

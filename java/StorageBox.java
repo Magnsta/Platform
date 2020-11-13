@@ -14,6 +14,8 @@ public class StorageBox {
   // height of the motors
   private double[] motors = new double[3];
   private double[] gyro = new double[3];
+  private double[] gyroFlat = new double[3];
+  private double[] acl = new double[3];
 
   public StorageBox() {
     this.motors[0] = 0;
@@ -22,45 +24,35 @@ public class StorageBox {
     this.gyro[0] = 0;
     this.gyro[1] = 0;
     this.gyro[2] = 0;
+    this.acl[0] = 0;
+    this.acl[1] = 0;
+    this.acl[2] = 0;
   }
 
   /**
+   *
+   * @param startValues
+   */
+  public void setSartPossitions(double[] startValues){
+    this.gyroFlat[0] = startValues[0];
+    this.gyroFlat[1] = startValues[1];
+    this.gyroFlat[2] = startValues[2];
+}
+  /**
    * sets an axie to a spesific value. fex x angle to 30 deg or z to 10 cm
    *
-   * @param axies the axie that is to be controlled
-   * @param value the new value for the axie, angle for x and y, mm for z.
+   * @param newValues the new value for the axie, angle for x and y, mm for z.
    * @throws InputMismatchException
    */
-  public synchronized void setAxies(Axies axies, double value) throws InputMismatchException {
-
-
-    //TODO:add limiting function based on the max angle of the motors so that they newer max out at the top or bottom
-    //     but aways has move to correct the angle of the system(limit height regulation)
-    switch (axies) {
-
-      case X:
-        if (isInsideLimits(value + motors[0]) && isInsideLimits(value - motors[1]) && isInsideLimits(value - motors[2])) {
-          this.motors[0] += value;
-          this.motors[1] -= value;
-          this.motors[2] -= value;
-        }
-        break;
-      case Y:
-        if (isInsideLimits(value + motors[1]) && isInsideLimits(value - motors[2])) {
-          this.motors[1] += value;
-          this.motors[2] -= value;
-        }
-        break;
-      case Z:
-        if (isInsideLimits(value + motors[0]) && isInsideLimits(value + motors[1]) && isInsideLimits(value + motors[2])) {
-          this.motors[0] += value;
-          this.motors[1] += value;
-          this.motors[2] += value;
-        }
-        break;
-      default:
-        throw new InputMismatchException("only X,Y and Z enums are valid inputs");
-    }
+  public synchronized void setFromOpenLog(double[] newValues) throws InputMismatchException {
+    if(newValues.length == 6){
+    this.gyro[0] = newValues[0];
+    this.gyro[1] = newValues[1];
+    this.gyro[2] = newValues[2];
+    this.acl[0] = newValues[3];
+    this.acl[1] = newValues[4];
+    this.acl[2] = newValues[5];}
+    else throw new InputMismatchException("value at storage box had" + newValues.length + "parameters, not 6");
   }
 
   public double getMotor1() {

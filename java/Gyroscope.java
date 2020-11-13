@@ -1,5 +1,4 @@
 import java.io.IOException;
-
 public class Gyroscope implements Runnable {
   private static long readFrec;
   private double[] gyroValues = new double[6];

@@ -66,7 +66,10 @@ public class SerialCom {
     ser.discardOutput();
 
   }
-
+public String readLine()throws IOException{
+    bfReader.readLine();
+    return bfReader.readLine();
+}
   public void discardAll() throws IllegalStateException, IOException {
     ser.discardAll();
 
