@@ -1,7 +1,6 @@
-import sun.nio.cs.UTF_8;
+
 
 import java.io.IOException;
-
 public class Gyroscope implements Runnable {
   private static long readFrec;
   private double[] gyroValues = new double[6];
@@ -13,9 +12,12 @@ public class Gyroscope implements Runnable {
     this.broadcaster = broadcaster;
     this.readFrec = readFreq;
     try {
-      ser = new SerialCom(tty, 9600);
+      ser = new SerialCom(tty, 115200);
+      
+    
     } catch (IOException IOe) {
       System.out.println(IOe.getMessage());
+      throw new RuntimeException("error in gyrothread: during creation" +IOe.getMessage());
 
       //TODO:Stopp system could Not Connect
 
@@ -23,26 +25,43 @@ public class Gyroscope implements Runnable {
   }
 
   public void run() {
-    while (true) {
+    startUp();
+    while (!Thread.currentThread().interrupted()){
+      System.out.println("gyro");
       updateGyroValues();
       broadcastGyroValues();
       broadcaster.awaitTimed(readFrec);
     }
+    System.out.println("gyro thread interupted during run time");
   }
 
-
+  private void startUp(){
+  try{      
+      String loggerOutput= ser.readLine();
+      System.out.println(loggerOutput);
+      broadcaster.awaitTimed(250);
+      while(!loggerOutput.matches("[\\d,.-]+")){
+        loggerOutput= ser.readLine();
+        System.out.println(loggerOutput);
+        broadcaster.awaitTimed(250);}
+        System.out.println("startup is done thread has no more characters " +
+                          loggerOutput +ser.readLine()+ "\n starting gyro readings");
+      broadcaster.awaitTimed(250);
+      }catch(IOException IOe){
+        throw new RuntimeException("error in gyrothread start up method: " + IOe.getMessage());
+      }
+      
+      
+  }
   private void updateGyroValues() {
     try {
-      byte[] data_recived = ser.read(8);
-      String gyroInfo = new String(data_recived, UTF_8.INSTANCE);
-      System.out.println(gyroInfo);
-      String[] gyroSplit = gyroInfo.substring(22).split(",");
-      System.out.println(gyroInfo);
-      gyroValues = parseStringArrayToDouble(gyroSplit);
-      System.out.println(gyroValues);
+      String[] gyroInfo = ser.readLine().split(",");
+      broadcaster.send(gyroInfo)
+    
     } catch (IOException IOe) {
       //TODO: stop system and go to alarm
 
+      throw new RuntimeException("error in gyrothread when updating values: " +IOe.getMessage());
     }
 
   }

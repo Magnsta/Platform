@@ -1,8 +1,11 @@
 import com.pi4j.io.serial.*;
+import com.pi4j.io.serial.Baud;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -17,8 +20,9 @@ import java.util.Collection;
  */
 public class SerialCom {
 
-  private Serial ser;
+  private com.pi4j.io.serial.Serial ser;
   private SerialConfig config;
+  private BufferedReader bfReader;
 
   public SerialCom(String tty, int baud) throws IOException, IllegalArgumentException {
     setUpSerial(tty, baud);
@@ -37,6 +41,7 @@ public class SerialCom {
     config = new SerialConfig();
     config.device(tty).baud(b).dataBits(DataBits._8).parity(Parity.NONE).stopBits(StopBits._1).flowControl(FlowControl.NONE);
     ser.open(config);
+    bfReader = new BufferedReader(new InputStreamReader(ser.getInputStream()));
   }
 
 
@@ -134,7 +139,12 @@ public class SerialCom {
   public void discardData() throws IllegalStateException, IOException {
     ser.discardData();
   }
+  public String readLine() throws IOException{
+    return bfReader.readLine();}
+public boolean lineReady() throws IOException{
+  return bfReader.ready();
 
+}
   public byte[] read() throws IllegalStateException, IOException {
     return ser.read();
   }
