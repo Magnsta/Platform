@@ -5,7 +5,7 @@ public class PlatformControler {
   static final public double PI = Math.PI;
 
   // platform constants
-  static final public double PLATFORM_LENGTH = 10; //platform length in cm.
+  static final public double PLATFORM_LENGTH = 10; //platform diameter in cm.
   static final public double ARM_LENGTH = 5;       //arm length in cm.
   static final public double ANGLE_CONSTANT = PLATFORM_LENGTH / (ARM_LENGTH * 4);
   static final public double MAX_ANGLE = Math.asin(ANGLE_CONSTANT * Math.sin(PI / 2));
