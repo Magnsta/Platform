@@ -1,6 +1,5 @@
-
-
 import java.io.IOException;
+
 public class Gyroscope implements Runnable {
   private static long readFrec;
   private double[] gyroValues = new double[6];
@@ -10,14 +9,14 @@ public class Gyroscope implements Runnable {
   public Gyroscope(Broadcast broadcaster, long readFreq, String tty) {
 
     this.broadcaster = broadcaster;
-    this.readFrec = readFreq;
+    readFrec = readFreq;
     try {
       ser = new SerialCom(tty, 115200);
-      
-    
+
+
     } catch (IOException IOe) {
       System.out.println(IOe.getMessage());
-      throw new RuntimeException("error in gyrothread: during creation" +IOe.getMessage());
+      throw new RuntimeException("error in gyrothread: during creation" + IOe.getMessage());
 
       //TODO:Stopp system could Not Connect
 
@@ -26,7 +25,7 @@ public class Gyroscope implements Runnable {
 
   public void run() {
     startUp();
-    while (!Thread.currentThread().interrupted()){
+    while (!Thread.interrupted()) {
       System.out.println("gyro");
       updateGyroValues();
       broadcastGyroValues();
@@ -35,33 +34,35 @@ public class Gyroscope implements Runnable {
     System.out.println("gyro thread interupted during run time");
   }
 
-  private void startUp(){
-  try{      
-      String loggerOutput= ser.readLine();
+  private void startUp() {
+    try {
+      String loggerOutput = ser.readLine();
       System.out.println(loggerOutput);
       broadcaster.awaitTimed(250);
-      while(!loggerOutput.matches("[\\d,.-]+")){
-        loggerOutput= ser.readLine();
+      while (!loggerOutput.matches("[\\d,.-]+")) {
+        loggerOutput = ser.readLine();
         System.out.println(loggerOutput);
-        broadcaster.awaitTimed(250);}
-        System.out.println("startup is done thread has no more characters " +
-                          loggerOutput +ser.readLine()+ "\n starting gyro readings");
-      broadcaster.awaitTimed(250);
-      }catch(IOException IOe){
-        throw new RuntimeException("error in gyrothread start up method: " + IOe.getMessage());
+        broadcaster.awaitTimed(250);
       }
-      
-      
+      System.out.println("startup is done thread has no more characters " +
+          loggerOutput + ser.readLine() + "\n starting gyro readings");
+      broadcaster.awaitTimed(250);
+    } catch (IOException IOe) {
+      throw new RuntimeException("error in gyrothread start up method: " + IOe.getMessage());
+    }
+
+
   }
+
   private void updateGyroValues() {
     try {
       String[] gyroInfo = ser.readLine().split(",");
-      broadcaster.send(gyroInfo)
-    
+      broadcaster.send(parseStringArrayToDouble(gyroInfo));
+
     } catch (IOException IOe) {
       //TODO: stop system and go to alarm
 
-      throw new RuntimeException("error in gyrothread when updating values: " +IOe.getMessage());
+      throw new RuntimeException("error in gyrothread when updating values: " + IOe.getMessage());
     }
 
   }

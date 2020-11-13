@@ -1,12 +1,6 @@
 import com.pi4j.io.serial.*;
-import com.pi4j.io.serial.Baud;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.Writer;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -139,12 +133,16 @@ public class SerialCom {
   public void discardData() throws IllegalStateException, IOException {
     ser.discardData();
   }
-  public String readLine() throws IOException{
-    return bfReader.readLine();}
-public boolean lineReady() throws IOException{
-  return bfReader.ready();
 
-}
+  public String readLine() throws IOException {
+    return bfReader.readLine();
+  }
+
+  public boolean lineReady() throws IOException {
+    return bfReader.ready();
+
+  }
+
   public byte[] read() throws IllegalStateException, IOException {
     return ser.read();
   }

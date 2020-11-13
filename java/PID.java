@@ -16,7 +16,7 @@ public class PID {
   }
 
   public synchronized double calculatePID(double is, double want) {
-    System.out.println("calculating pid:cis: " + is+ "  want:  " +want);
+    System.out.println("calculating pid:cis: " + is + "  want:  " + want);
     error = is - want;
     integratedError += error;
     output += P * error;

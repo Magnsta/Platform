@@ -8,13 +8,14 @@ public class MotorController implements Runnable {
   private int maxEnc; //maximum encoder value
   private int minEnc; // minimum encoder value
 
-  public MotorController( Broadcast broadcaster, Axies axie, StorageBox box) {
+  public MotorController(Broadcast broadcaster, Axies axie, StorageBox box) {
     this.axie = axie;
     this.broadcaster = broadcaster;
     this.box = box;
     this.recived = true;
 
   }
+
   private double getRotations(double angle) {
     double returnvalue = 0;
     if (PlatformControler.PI / 2 > Math.abs(angle)) {

@@ -7,7 +7,7 @@ public class Broadcast {
   private int numberOfConsumers;
   private StorageBox box;
 
-  public Broadcast(int numberOfConsumers,StorageBox box) {
+  public Broadcast(int numberOfConsumers, StorageBox box) {
     this.numberOfConsumers = numberOfConsumers;
     this.arrived = false;
     this.waiting = 0;
@@ -56,15 +56,18 @@ public class Broadcast {
   public synchronized void await() {
     try {
       this.wait();
-    } catch (InterruptedException e){}catch (IllegalMonitorStateException e2) {
+    } catch (InterruptedException e) {
+    } catch (IllegalMonitorStateException e2) {
       System.out.println(e2.getMessage());
 
     }
   }
+
   public synchronized void awaitTimed(long time) {
     try {
       this.wait(time);
-    } catch (InterruptedException e){}catch (IllegalMonitorStateException e2) {
+    } catch (InterruptedException e) {
+    } catch (IllegalMonitorStateException e2) {
       System.out.println(e2.getMessage());
 
     }
