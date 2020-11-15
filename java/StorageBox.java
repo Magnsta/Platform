@@ -1,4 +1,3 @@
-import java.util.InputMismatchException;
 
 /**
  * stores the height of each motor and changes them based on angle inputs.
@@ -30,29 +29,34 @@ public class StorageBox {
   }
 
   /**
-   *
    * @param startValues
    */
-  public void setSartPossitions(double[] startValues){
+  public void setSartPossitions(double[] startValues) {
     this.gyroFlat[0] = startValues[0];
     this.gyroFlat[1] = startValues[1];
     this.gyroFlat[2] = startValues[2];
-}
+  }
+
+  public double getStartPossition(Axies axie) {
+    return getSpesificAxie(axie, gyroFlat);
+  }
+
+
   /**
    * sets an axie to a spesific value. fex x angle to 30 deg or z to 10 cm
    *
    * @param newValues the new value for the axie, angle for x and y, mm for z.
-   * @throws InputMismatchException
+   * @throws IllegalArgumentException
    */
-  public synchronized void setFromOpenLog(double[] newValues) throws InputMismatchException {
-    if(newValues.length == 6){
-    this.gyro[0] = newValues[0];
-    this.gyro[1] = newValues[1];
-    this.gyro[2] = newValues[2];
-    this.acl[0] = newValues[3];
-    this.acl[1] = newValues[4];
-    this.acl[2] = newValues[5];}
-    else throw new InputMismatchException("value at storage box had" + newValues.length + "parameters, not 6");
+  public synchronized void setFromOpenLog(double[] newValues) throws IllegalArgumentException {
+    if (newValues.length == 6) {
+      this.gyro[0] = newValues[0];
+      this.gyro[1] = newValues[1];
+      this.gyro[2] = newValues[2];
+      this.acl[0] = newValues[3];
+      this.acl[1] = newValues[4];
+      this.acl[2] = newValues[5];
+    } else throw new IllegalArgumentException("value at storage box had" + newValues.length + "parameters, not 6");
   }
 
   public double getMotor1() {
@@ -72,42 +76,24 @@ public class StorageBox {
   }
 
   public double getGyroAxie(Axies axies) {
-    switch (axies) {
-      case X:
-        return gyro[0];
-      case Y:
-        return gyro[1];
-      case Z:
-        return gyro[2];
-      default:
-        throw new InputMismatchException(" not an valid axies");
-    }
+    return getSpesificAxie(axies, gyro);
   }
 
-  public synchronized void setMotor(int motorNbr, double value) {
-    switch (motorNbr) {
-      case 1:
-        motors[0] = value;
-        break;
-      case 2:
-        motors[1] = value;
-        break;
-      case 3:
-        motors[2] = value;
-        break;
-
-    }
+  public synchronized void addToAxies(double value1, double value2, double value3) {
+    motors[0] += value1;
+    motors[1] += value2;
+    motors[2] += value3;
   }
+
 
   /**
    * returnes the angle or height of an axie.
    *
    * @param axies the axie.
    * @return the angle or heigth.
-   * @throws InputMismatchException if the axie is not valid
+   * @throws IllegalArgumentException if the axie is not valid
    */
-  public double getAxies(Axies axies) throws InputMismatchException {
-    System.out.println("motor 1 , 2 , 3:   " + getMotor1() + " , " + getMotor2() + " , " + getMotor3());
+  public double getAxies(Axies axies) throws IllegalArgumentException {
     switch (axies) {
       case X:
         return Math.asin((getMotor1() - (getMotor2() + getMotor3()) / 2) / 2);
@@ -116,12 +102,32 @@ public class StorageBox {
         return Math.asin((getMotor2() - getMotor3()) / 2);
 
       case Z:
-        return (getMotor3() + getMotor2() + getMotor1()) / 3;
+        return (getMotor3() + getMotor2() + getMotor1());
 
       default:
-        throw new InputMismatchException("only X,Y and Z enums are valid inputs");
+        throw new IllegalArgumentException("only X,Y and Z enums are valid inputs");
     }
   }
+
+  /**
+   *
+   * @param axies
+   * @param value
+   * @throws IllegalArgumentException
+   */
+  public synchronized void setAxies(Axies axies, double value) throws IllegalArgumentException {
+    switch (axies) {
+      case X:
+        addToAxies(value / 2, -value / 2, -value / 2);
+      case Y:
+        addToAxies(0, value / 2, -value / 2);
+      case Z:
+        addToAxies(value, value, value);
+      default:
+        throw new IllegalArgumentException("only X,Y and Z enums are valid inputs");
+    }
+  }
+
 
   /**
    * @return
@@ -149,5 +155,25 @@ public class StorageBox {
   private boolean isBetween(double min, double max, double value) {
     return (value > min) && (max > value);
 
+  }
+
+  /**
+   * returns a double represeting a spesific axie,
+   *
+   * @param axie the axie
+   * @param d    the list of possible axie values
+   * @return the value corespondingwith our axie
+   */
+  private double getSpesificAxie(Axies axie, double[] d) {
+    switch (axie) {
+      case X:
+        return d[0];
+      case Y:
+        return d[1];
+      case Z:
+        return d[2];
+      default:
+        throw new IllegalArgumentException(" not an valid axies");
+    }
   }
 }

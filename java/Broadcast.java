@@ -1,4 +1,4 @@
-import java.util.InputMismatchException;
+
 
 public class Broadcast {
   private double[] message;
@@ -17,7 +17,7 @@ public class Broadcast {
   public synchronized boolean send(double[] sendMessage) {
     boolean sent = false;
     if ((waiting >= 1) && (!arrived)) {
-      box.setAxies(sendMessage);
+      box.setFromOpenLog(sendMessage);
       arrived = true;
       this.notifyAll();
       sent = true;
@@ -29,7 +29,7 @@ public class Broadcast {
     return sent;
   }
 
-  public synchronized double recive(Axies axie) throws InputMismatchException {
+  public synchronized double recive(Axies axie) {
 
     try {
       while (!arrived) {

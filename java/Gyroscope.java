@@ -1,24 +1,22 @@
 import java.io.IOException;
+
 public class Gyroscope implements Runnable {
   private static long readFrec;
-  private double[] gyroValues = new double[6];
+  private double[] gyroValues;
   private Broadcast broadcaster;
   private SerialCom ser;
+  private boolean isReady;
 
   public Gyroscope(Broadcast broadcaster, long readFreq, String tty) {
-
     this.broadcaster = broadcaster;
     readFrec = readFreq;
+    gyroValues = new double[6];
+    isReady = false;
     try {
       ser = new SerialCom(tty, 115200);
-
-
     } catch (IOException IOe) {
       System.out.println(IOe.getMessage());
       throw new RuntimeException("error in gyrothread: during creation" + IOe.getMessage());
-
-      //TODO:Stopp system could Not Connect
-
     }
   }
 
@@ -46,11 +44,10 @@ public class Gyroscope implements Runnable {
       System.out.println("startup is done thread has no more characters " +
           loggerOutput + ser.readLine() + "\n starting gyro readings");
       broadcaster.awaitTimed(250);
+      isReady = true;
     } catch (IOException IOe) {
       throw new RuntimeException("error in gyrothread start up method: " + IOe.getMessage());
     }
-
-
   }
 
   private void updateGyroValues() {
@@ -59,11 +56,8 @@ public class Gyroscope implements Runnable {
       broadcaster.send(parseStringArrayToDouble(gyroInfo));
 
     } catch (IOException IOe) {
-      //TODO: stop system and go to alarm
-
       throw new RuntimeException("error in gyrothread when updating values: " + IOe.getMessage());
     }
-
   }
 
   private void broadcastGyroValues() {
@@ -76,5 +70,9 @@ public class Gyroscope implements Runnable {
       d[i] = Double.parseDouble(s[i]);
     }
     return d;
+  }
+
+  public boolean isReady() {
+    return isReady;
   }
 }

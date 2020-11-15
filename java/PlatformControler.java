@@ -15,57 +15,63 @@ public class PlatformControler {
    * @param args
    */
   public static void main(String[] args) {
+
+    //initialize storage box
     StorageBox box = new StorageBox();
 
-    //TODO: add startup for system
-
-
-    // initialize io reader:
-
+    //initialize broadcaster
     Broadcast broadcaster = new Broadcast(3, box);
+
+    // initialize producer
     Gyroscope IOReadingThread = new Gyroscope(broadcaster, 100, "/dev/ttyUSB0");
     // initialize consumer threads
-    MotorController Xcalculator = new MotorController(broadcaster, Axies.X, box);
-    MotorController Ycalculator = new MotorController(broadcaster, Axies.Y, box);
-    MotorController Zcalculator = new MotorController(broadcaster, Axies.Z, box);
+
+    MotorController Xcalculator = new MotorController(broadcaster, Axies.X, box, 0, 1);
+    MotorController Ycalculator = new MotorController(broadcaster, Axies.Y, box, 0, 1);
+    MotorController Zcalculator = new MotorController(broadcaster, Axies.Z, box, 0, 1);
+
     // initialise writer
+    MotorWriter motorWriter = new MotorWriter(10, box, "/dev/ttyAMA0");
 
+    // initialise threads
+    Thread thread1 = new Thread(IOReadingThread, "Gyro thread");
+    Thread thread2 = new Thread(Xcalculator, "X controller thread");
+    Thread thread3 = new Thread(Ycalculator, "Y controller thread");
+    Thread thread4 = new Thread(Zcalculator, "Z controller thread");
+    Thread thread5 = new Thread(motorWriter, "motorWriter thread");
 
-    Thread thread1 = new Thread(IOReadingThread);
-    Thread thread2 = new Thread(Xcalculator);
-    Thread thread3 = new Thread(Ycalculator);
-    Thread thread4 = new Thread(Zcalculator);
-    //Thread thread5 = new Thread();
-    // set up error handeling
+    // set up error handling to stop the program in the case of a communication error
     Thread.UncaughtExceptionHandler h = (t, e) -> {
-      System.out.println(e.getMessage());
       thread1.interrupt();
       thread2.interrupt();
       thread3.interrupt();
       thread4.interrupt();
-      System.out.println("Error: closed all threads: " +
-          "\nthread1 " + !thread1.isAlive() +
-          "\nthread2 " + !thread2.isAlive() +
-          "\nthread3 " + !thread3.isAlive() +
-          "\nthread4 " + !thread4.isAlive());
+      thread5.interrupt();
+      System.out.println("Error: closed all threads\nError message: " + e.getMessage() + "\n " +
+          "\nthread1 closed:" + thread1.isInterrupted() +
+          "\nthread2 closed:" + thread2.isInterrupted() +
+          "\nthread3 closed:" + thread3.isInterrupted() +
+          "\nthread4 closed:" + thread4.isInterrupted() +
+          "\nthread5 closed:" + thread5.isInterrupted());
+      //TODO:Add ALARM
       System.exit(1);
     };
-
     thread1.setUncaughtExceptionHandler(h);
     thread2.setUncaughtExceptionHandler(h);
     thread3.setUncaughtExceptionHandler(h);
     thread4.setUncaughtExceptionHandler(h);
+    thread5.setUncaughtExceptionHandler(h);
+
     // start Threads
     thread1.start();
     thread2.start();
     thread3.start();
     thread4.start();
 
-
-    System.out.println("gyro running: " + thread1.isAlive());
-    System.out.println("coontroller1 running: " + thread2.isAlive());
-    System.out.println("coontroller2 running: " + thread3.isAlive());
-    System.out.println("coontroller3 running: " + thread4.isAlive());
+    System.out.println("gyro running:        " + thread1.isAlive());
+    System.out.println("controller1 running: " + thread2.isAlive());
+    System.out.println("controller1 running: " + thread3.isAlive());
+    System.out.println("controller1 running: " + thread4.isAlive());
 
   }
 }

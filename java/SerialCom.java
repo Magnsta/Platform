@@ -59,35 +59,28 @@ public class SerialCom {
 
   public void discardInput() throws IllegalStateException, IOException {
     ser.discardInput();
-
   }
 
   public void discardOutput() throws IllegalStateException, IOException {
     ser.discardOutput();
-
   }
 public String readLine()throws IOException{
-    bfReader.readLine();
     return bfReader.readLine();
 }
   public void discardAll() throws IllegalStateException, IOException {
     ser.discardAll();
-
   }
 
   public void sendBreak(int i) throws IllegalStateException, IOException {
     ser.sendBreak(i);
-
   }
 
   public void sendBreak() throws IllegalStateException, IOException {
     ser.sendBreak();
-
   }
 
   public void setBreak(boolean b) throws IllegalStateException, IOException {
     ser.setBreak(b);
-
   }
 
   public boolean getRTS() throws IllegalStateException, IOException {
@@ -96,12 +89,10 @@ public String readLine()throws IOException{
 
   public void setRTS(boolean b) throws IllegalStateException, IOException {
     ser.setRTS(b);
-
   }
 
   public void addListener(SerialDataEventListener... serialDataEventListeners) {
     ser.addListener(serialDataEventListeners);
-
   }
 
   public void removeListener(SerialDataEventListener... serialDataEventListeners) {
@@ -126,7 +117,6 @@ public String readLine()throws IOException{
 
   public void setBufferingDataReceived(boolean b) {
     ser.setBufferingDataReceived(b);
-
   }
 
   public int available() throws IllegalStateException, IOException {
@@ -135,15 +125,6 @@ public String readLine()throws IOException{
 
   public void discardData() throws IllegalStateException, IOException {
     ser.discardData();
-  }
-
-  public String readLine() throws IOException {
-    return bfReader.readLine();
-  }
-
-  public boolean lineReady() throws IOException {
-    return bfReader.ready();
-
   }
 
   public byte[] read() throws IllegalStateException, IOException {
@@ -266,5 +247,3 @@ public String readLine()throws IOException{
     ser.writeln(collection);
   }
 }
-
-
