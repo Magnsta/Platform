@@ -10,6 +10,15 @@ public class Commands {
     commands = new HashMap<Cmd, Integer>();
 
     //--------------------COMMANDS--------------------------------------------------
+
+    commands.put(Cmd.READ_ENC1,16);
+    commands.put(Cmd.READ_ENC2,17);
+    commands.put(Cmd.DRIVE_FORWARD,8);
+    commands.put(Cmd.DRIVE_BACKWARD,9);
+    commands.put(Cmd.DRIVE_FORWARD_M1,0);
+    commands.put(Cmd.DRIVE_BACKWARDS_M1,1);
+    commands.put(Cmd.DRIVE_FORWARD_M2,4);
+    commands.put(Cmd.DRIVE_BACKWARDS_M2,5);
     commands.put(Cmd.READ_M1_SPEED, 18);//Read M1 Speed in Encoder Counts Per Second.
     commands.put(Cmd.READ_M2_SPEED, 19);//Read M2 Speed in Encoder Counts Per Second.
     commands.put(Cmd.READ_CUR_1, 30);//Read Current M1 Raw Speed

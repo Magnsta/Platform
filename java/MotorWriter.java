@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class MotorWriter implements Runnable {
   private final long FREQ;
@@ -26,8 +27,8 @@ public class MotorWriter implements Runnable {
     } catch (IllegalArgumentException e) {
       System.out.println(e.getMessage());
     } catch (IOException IOe) {
-      System.out.println(IOe.getMessage());
-      //TODO:stop system comunication could not start}
+      throw new RuntimeException("error in thead: " + Thread.currentThread().getName() +
+          "\n error Message: " + IOe.getMessage());
     }
   }
 
@@ -47,29 +48,40 @@ public class MotorWriter implements Runnable {
   }
 
   private void sendNewMotorPositions(int[] newValues) {
-    sendMotorPos(1, newValues[0]);
-    sendMotorPos(2, newValues[1]);
-    sendMotorPos(3, newValues[2]);
+    sendM1Pos(newValues[0]);
+    sendM2Pos(newValues[1]);
+    sendM3Pos(newValues[2]);
   }
 
-  private void sendMotorPos(int motor, int encValue) {
-    byte command;
+  private void sendM1Pos(int encValue) {
+    sendCommandArray(mc1.setPosM1Cmd(encValue));
+  }
+
+  private void sendM2Pos(int encValue) {
+    sendCommandArray(mc1.setPosM2Cmd(encValue));
+  }
+
+  private void sendM3Pos(int encValue) {
+    sendCommandArray(mc2.setPosM1Cmd(encValue));
+  }
+
+  private void setMotorPos(int motor, int encValue) {
+    ArrayList<byte[]> commandArray;
     switch (motor) {
       case 1:
-        command = mc1.setPosM1Cmd(encValue);
-
+        commandArray = mc1.setPosM1Cmd(encValue);
         break;
       case 2:
-        command = mc1.setPosM2Cmd(encValue);
+        commandArray = mc1.setPosM2Cmd(encValue);
         break;
       case 3:
-        command = mc2.setPosM1Cmd(encValue);
+        commandArray = mc2.setPosM1Cmd(encValue);
         break;
 
       default:
         throw new IllegalArgumentException("error int " + motor + "has no corresponding motor unit.");
     }
-    sendCommand(command);
+    sendCommandArray(commandArray);
   }
 
 
@@ -77,7 +89,7 @@ public class MotorWriter implements Runnable {
     throw new RuntimeException("program the reset motors method you dufus!");
   }
 
-  private void sendCommand(byte cmd) {
+  private void sendCommand(byte[] cmd) {
     try {
       ser.write(cmd);
     } catch (IOException IOe1) {
@@ -89,6 +101,12 @@ public class MotorWriter implements Runnable {
             + "\nTwo tries gave error messages:" + "\n" + IOe1.getMessage() + "\n" + IOe2.getMessage());
       } catch (InterruptedException e) {
       }
+    }
+  }
+
+  private void sendCommandArray(ArrayList<byte[]> ba) {
+    for (byte[] bs : ba) {
+      sendCommand(bs);
     }
   }
 
@@ -112,5 +130,14 @@ public class MotorWriter implements Runnable {
 
   private double projectDouble(double value, int max, int min, double scale) {
     return (value * ((max - min) / scale));
+  }
+  private void driveM1(int speed){
+    sendCommandArray(mc1.driveM1Cmd(speed));
+  }
+  private void driveM2(int speed){
+    sendCommandArray(mc1.driveM2Cmd(speed));
+  }
+  private void driveM3(int speed){
+    sendCommandArray(mc2.driveM1Cmd(speed));
   }
 }

@@ -26,19 +26,19 @@ public class PlatformControler {
     Gyroscope IOReadingThread = new Gyroscope(broadcaster, 100, "/dev/ttyUSB0");
     // initialize consumer threads
 
-    MotorController Xcalculator = new MotorController(broadcaster, Axies.X, box, 0, 1);
-    MotorController Ycalculator = new MotorController(broadcaster, Axies.Y, box, 0, 1);
-    MotorController Zcalculator = new MotorController(broadcaster, Axies.Z, box, 0, 1);
+    MotorController XCalculator = new MotorController(broadcaster, Axies.X, box, 0, 1);
+    MotorController YCalculator = new MotorController(broadcaster, Axies.Y, box, 0, 1);
+    MotorController ZCalculator = new MotorController(broadcaster, Axies.Z, box, 0, 1);
 
     // initialise writer
     MotorWriter motorWriter = new MotorWriter(10, box, "/dev/ttyAMA0");
 
     // initialise threads
-    Thread thread1 = new Thread(IOReadingThread, "Gyro thread");
-    Thread thread2 = new Thread(Xcalculator, "X controller thread");
-    Thread thread3 = new Thread(Ycalculator, "Y controller thread");
-    Thread thread4 = new Thread(Zcalculator, "Z controller thread");
-    Thread thread5 = new Thread(motorWriter, "motorWriter thread");
+    Thread thread1 = new Thread(IOReadingThread, "Gyro reader thread");
+    Thread thread2 = new Thread(XCalculator, "X controller thread");
+    Thread thread3 = new Thread(YCalculator, "Y controller thread");
+    Thread thread4 = new Thread(ZCalculator, "Z controller thread");
+    Thread thread5 = new Thread(motorWriter, "Motor writer thread");
 
     // set up error handling to stop the program in the case of a communication error
     Thread.UncaughtExceptionHandler h = (t, e) -> {

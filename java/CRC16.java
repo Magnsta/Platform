@@ -10,6 +10,9 @@
 // This package has been largely inspired by Ross Williams' 1993 paper "A Painless Guide to CRC Error Detection Algorithms".
 // A good list of parameter sets for various CRC algorithms can be found at http://reveng.sourceforge.net/crc-catalogue/.
 
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+
 public class CRC16 {
 
   /**
@@ -67,5 +70,22 @@ public class CRC16 {
       }
     }
     return ret;
+  }
+
+  public static long crcForCommand(ArrayList<byte[]> bb) {
+    long crc = 0;
+    for (byte[] bs : bb) {
+      crc = (crc << bs.length * 8) ^ calcCrc16(bs);
+    }
+    return crc;
+  }
+
+  private static long bytesToLong(byte[] bb) {
+    long l = 0;
+    for (int i : bb) {
+      l <<= 8;
+      l ^= bb[i] & 0xff;
+    }
+    return l;
   }
 }
