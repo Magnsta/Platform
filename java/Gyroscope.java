@@ -22,8 +22,7 @@ public class Gyroscope implements Runnable {
 
   public void run() {
     startUp();
-    while (!Thread.interrupted()) {
-      System.out.println("gyro");
+    while (!Thread.currentThread().isInterrupted()) {
       updateGyroValues();
       broadcastGyroValues();
       broadcaster.awaitTimed(readFrec);

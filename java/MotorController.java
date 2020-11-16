@@ -44,7 +44,7 @@ public class MotorController implements Runnable {
     double angle = 0; //= box.getAxies(axie);
     double newAngle;
     //while thread is running wait for broadcast then proses info and send it to writer
-    while (!Thread.currentThread().interrupted()) {
+    while (!Thread.currentThread().isInterrupted()) {
 
       while (!recived) {
         broadcaster.await();

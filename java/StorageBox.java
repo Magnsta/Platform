@@ -1,3 +1,5 @@
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * stores the height of each motor and changes them based on angle inputs.
@@ -142,6 +144,7 @@ public class StorageBox {
    * @param value
    * @return
    */
+  @Contract(pure = true)
   private boolean isInsideLimits(double value) {
     return isBetween(MIN_HEIGHT, MAX_HEIGHT, value);
   }
@@ -152,6 +155,7 @@ public class StorageBox {
    * @param value the value that you want to check
    * @return true if the value is between the min and max value
    */
+  @Contract(pure = true)
   private boolean isBetween(double min, double max, double value) {
     return (value > min) && (max > value);
 
@@ -164,7 +168,8 @@ public class StorageBox {
    * @param d    the list of possible axie values
    * @return the value corespondingwith our axie
    */
-  private double getSpesificAxie(Axies axie, double[] d) {
+  @Contract(pure = true)
+  private double getSpesificAxie(@NotNull Axies axie, double[] d) {
     switch (axie) {
       case X:
         return d[0];

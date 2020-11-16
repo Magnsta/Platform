@@ -50,12 +50,16 @@ public class CRC16 {
     return crc;
   }
 
+  public static boolean checkCrc(byte[] packet, byte[] crcToTest) {
+    return (calcCrc16(packet) == ByteBuffer.wrap(crcToTest).getLong());
+  }
+
 
   /**
    * borrowed from : https://github.com/snksoft/java-crc/blob/master/src/main/java/com/github/snksoft/crc/CRC.java?fbclid=IwAR3JZjjAJOjlaU3k9zZT94Mzz0UCtziwOkknQ6wn95Md4hS1ohkcrZxu2Ac
    * Reverses order of last count bits.
    *
-   * @param in value wich bits need to be reversed
+   * @param in value which bits need to be reversed
    * @return the value with specified bits order reversed
    */
   private static long reflect(long in, int count) {
