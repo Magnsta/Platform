@@ -75,14 +75,14 @@ public class CRC16 {
     }
     return ret;
   }
-
+/*
   public static long crcForCommand(ArrayList<byte[]> bb) {
     long crc = 0;
     for (byte[] bs : bb) {
       crc = (crc << bs.length * 8) ^ calcCrc16(bs);
     }
     return crc;
-  }
+  }*/
 
   private static long bytesToLong(byte[] bb) {
     long l = 0;

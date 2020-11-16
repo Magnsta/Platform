@@ -1,7 +1,5 @@
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 
 public class MotorWriter implements Runnable {
   private final long FREQ;
@@ -38,7 +36,6 @@ public class MotorWriter implements Runnable {
 
   public void run() {
     resetMotorsAndEncoders();
-
     int[] newPos;
     while (!Thread.currentThread().isInterrupted()) {
       try {
@@ -58,26 +55,29 @@ public class MotorWriter implements Runnable {
   }
 
   public void sendM1Pos(int encValue) {
-    ArrayList<byte[]> cmd = mc1.setPosM1Cmd(encValue);
-    for(byte[] bs : cmd){
-       System.out.println(ByteBuffer.wrap(bs).getInt());}
+    byte[] cmd = mc1.setPosM1Cmd(encValue);
+    System.out.println(ByteBuffer.wrap(cmd).getInt());
+
     sendCommandArray(cmd);
   }
 
-  public void sendM2Pos(int encValue) {ArrayList<byte[]> cmd = mc1.setPosM2Cmd(encValue);
-    for(byte[] bs : cmd){
-       System.out.println(ByteBuffer.wrap(bs).getInt());}
+  public void sendM2Pos(int encValue) {
+    byte[] cmd = mc1.setPosM2Cmd(encValue);
+    System.out.println(ByteBuffer.wrap(cmd).getInt());
+
     sendCommandArray(cmd);
   }
 
-  public void sendM3Pos(int encValue) {ArrayList<byte[]> cmd = mc2.setPosM1Cmd(encValue);
-    for(byte[] bs : cmd){
-       System.out.println(ByteBuffer.wrap(bs).getInt());}
+  public void sendM3Pos(int encValue) {
+    byte[] cmd = mc2.setPosM1Cmd(encValue);
+
+    System.out.println(ByteBuffer.wrap(cmd).getInt());
+
     sendCommandArray(cmd);
   }
 
   private void setMotorPos(int motor, int encValue) {
-    ArrayList<byte[]> commandArray;
+    byte[] commandArray;
     switch (motor) {
       case 1:
         commandArray = mc1.setPosM1Cmd(encValue);
@@ -114,37 +114,39 @@ public class MotorWriter implements Runnable {
   }
 
 
-  private void resetMotorsAndEncoders() {/*
-    driveM1(-100);
-    boolean atEnd = false;
-    while (!atEnd) {
-      throw new RuntimeException("program the reset motors method you dufus!");
-      //getInput form sensor
-      atEnd = getInputFormSensor(1);
-    }
-    sendCommandArray(mc1.stopM1());
-    sendCommandArray(mc1.resetEnc1Cmd());
+  private void resetMotorsAndEncoders() {
+    //TODO: readd this mehtod
+    /**
+     driveM1(-100);
+     boolean atEnd = false;
+     while (!atEnd) {
+     throw new RuntimeException("program the reset motors method you dufus!");
+     //getInput form sensor
+     atEnd = getInputFormSensor(1);
+     }
+     sendCommandArray(mc1.stopM1());
+     sendCommandArray(mc1.resetEnc1Cmd());
 
-    driveM2(-100);
-    atEnd = false;
-    while (!atEnd) {
-      //getInput form sensor
-      atEnd = getInputFormSensor(2);
-    }
-    sendCommandArray(mc1.stopM2());
-    sendCommandArray(mc1.resetEnc2Cmd());
-    driveM3(-100);
-    atEnd = false;
-    while (!atEnd) {
-      //getInput form sensor
-      atEnd = getInputFormSensor(3);
-    }
-    sendCommandArray(mc2.stopM1());
-    sendCommandArray(mc2.resetEnc1Cmd());
+     driveM2(-100);
+     atEnd = false;
+     while (!atEnd) {
+     //getInput form sensor
+     atEnd = getInputFormSensor(2);
+     }
+     sendCommandArray(mc1.stopM2());
+     sendCommandArray(mc1.resetEnc2Cmd());
+     driveM3(-100);
+     atEnd = false;
+     while (!atEnd) {
+     //getInput form sensor
+     atEnd = getInputFormSensor(3);
+     }
+     sendCommandArray(mc2.stopM1());
+     sendCommandArray(mc2.resetEnc1Cmd());
 
-    setMotorPos(1, (int) ((maxEnc - minEnc) / 2));
-    setMotorPos(2, (int) ((maxEnc - minEnc) / 2));
-    setMotorPos(3, (int) ((maxEnc - minEnc) / 2));*/
+     setMotorPos(1, (int) ((maxEnc - minEnc) / 2));
+     setMotorPos(2, (int) ((maxEnc - minEnc) / 2));
+     setMotorPos(3, (int) ((maxEnc - minEnc) / 2));*/
   }
 
   private void sendCommand(byte[] cmd) {
@@ -162,13 +164,13 @@ public class MotorWriter implements Runnable {
     }
   }
 
-  private void sendCommandArray(ArrayList<byte[]> ba) {
-    for (byte[] bs : ba) {
-      sendCommand(bs);
+  private void sendCommandArray(byte[] ba) {
+    sendCommand(ba);
+    try {
+      System.out.println(ser.readLine());
+    } catch (IOException e) {
+      System.out.println(e.getMessage());
     }
-    try{
-    System.out.println(ser.readLine());}catch(IOException e){
-      System.out.println(e.getMessage());}
   }
 
   /**
@@ -203,5 +205,12 @@ public class MotorWriter implements Runnable {
 
   private void driveM3(int speed) {
     sendCommandArray(mc2.driveM1Cmd(speed));
+  }
+
+  private byte[] mergeByteArray(byte[] a, byte[] b) {
+    byte[] r = new byte[a.length + b.length];
+    System.arraycopy(a, 0, r, 0, a.length);
+    System.arraycopy(b, 0, r, a.length, b.length);
+    return r;
   }
 }
