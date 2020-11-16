@@ -1,4 +1,5 @@
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 
 /**
  * Handler for commands for a Roboclaw Motor controller;
@@ -14,7 +15,7 @@ public class RoboClaw {
   private int speed;// speed of the position control.
   private int accel;//acceleration of the position control.
   private int deccel;//deceleration of the position control.
-  private byte[] stoppBothMotorCommand; // stop command is pre generated for speedy delivery;
+  private ArrayList<byte[]> stoppBothMotorCommand; // stop command is pre generated for speedy delivery;
 
   /**
    * @param address
@@ -38,7 +39,7 @@ public class RoboClaw {
    *
    * @return [Address, 22, Value(0), CRC(2 bytes)]
    */
-  public byte[] resetEnc1Cmd() {
+  public ArrayList<byte[]> resetEnc1Cmd() {
     int cmd = cmds.get(Cmd.SET_ENC1);
     return getCmdArray(new int[]{address, cmd, 0});
   }
@@ -49,7 +50,7 @@ public class RoboClaw {
    *
    * @return [Address, 22, Value(0), CRC(2 bytes)]
    */
-  public byte[] resetEnc2Cmd() {
+  public ArrayList<byte[]> resetEnc2Cmd() {
     int cmd = cmds.get(Cmd.SET_ENC2);
     return getCmdArray(new int[]{address, cmd, 0});
   }
@@ -64,7 +65,7 @@ public class RoboClaw {
    *
    * @return [Address, 16]
    */
-  public byte[] getEnc1Cmd() {
+  public ArrayList<byte[]> getEnc1Cmd() {
     int cmd = cmds.get(Cmd.READ_ENC1);
     return getCmdArray(new int[]{address, cmd});
   }
@@ -77,7 +78,7 @@ public class RoboClaw {
    *
    * @return [Address, 17]
    */
-  public byte[] getEnc2Cmd() {
+  public ArrayList<byte[]> getEnc2Cmd() {
     int cmd = cmds.get(Cmd.READ_ENC2);
     return getCmdArray(new int[]{address, cmd});
   }
@@ -94,7 +95,7 @@ public class RoboClaw {
    * @param speed speed of motor
    * @return [Address, 35, Speed(4 Bytes), CRC(2 bytes)]
    */
-  public byte[] driveM1Cmd(int speed) {
+  public ArrayList<byte[]> driveM1Cmd(int speed) {
     int cmd = cmds.get(Cmd.DRIVE_M1_SIGN_SPD);
     return setDriveMtrCmd(speed, cmd);
   }
@@ -110,7 +111,7 @@ public class RoboClaw {
    * @param speed speed of motor
    * @return [Address, 35, Speed(4 Bytes), CRC(2 bytes)]
    */
-  public byte[] driveM2Cmd(int speed) {
+  public ArrayList<byte[]> driveM2Cmd(int speed) {
     int cmd = cmds.get(Cmd.DRIVE_M2_SIGN_SPD);
     return setDriveMtrCmd(speed, cmd);
   }
@@ -125,7 +126,7 @@ public class RoboClaw {
    * @param encPos the new ecoder pos for the motor
    * @return [Address, 65, Accel(4 bytes), Speed(4 Bytes), Deccel(4 bytes), Position(4 Bytes), Buffer, CRC(2 bytes)]
    */
-  public byte[] setPosM1Cmd(int encPos) {
+  public ArrayList<byte[]> setPosM1Cmd(int encPos) {
     return setPosCmd(encPos, Cmd.DRIVE_M1_SPD_ACL_DCL_POS);
   }
 
@@ -139,7 +140,7 @@ public class RoboClaw {
    * @param encPos the new ecoder pos for the motor
    * @return [Address, 65, Accel(4 bytes), Speed(4 Bytes), Deccel(4 bytes), Position(4 Bytes), Buffer, CRC(2 bytes)]
    */
-  public byte[] setPosM2Cmd(int encPos) {
+  public ArrayList<byte[]> setPosM2Cmd(int encPos) {
     return setPosCmd(encPos, Cmd.DRIVE_M2_SPD_ACL_DCL_POS);
   }
 
@@ -148,7 +149,7 @@ public class RoboClaw {
    *
    * @return [Address, 7,0,crc(2 bytes)]
    */
-  public byte[] stopM1() {
+  public ArrayList<byte[]> stopM1() {
     int cmd = cmds.get(Cmd.DRIVE_FORWARD_M1);
     return stopMotor(cmd);
   }
@@ -158,7 +159,7 @@ public class RoboClaw {
    *
    * @return [Address, 7,0,crc(2 bytes)]
    */
-  public byte[] stopM2() {
+  public ArrayList<byte[]> stopM2() {
     int cmd = cmds.get(Cmd.DRIVE_FORWARD_M2);
     return stopMotor(cmd);
   }
@@ -168,36 +169,35 @@ public class RoboClaw {
    *
    * @return [address, 7, 0, crc]
    */
-  public byte[] stopAllMotorsCmd() {
+  public ArrayList<byte[]> stopAllMotorsCmd() {
     return this.stoppBothMotorCommand;
   }
 
-  private byte[] getCmdArray(int[] cmds) {
-    byte[] ret = addIntsToByteArray(cmds);
+  private ArrayList<byte[]> getCmdArray(int[] cmds) {
+    ArrayList<byte[]> ret = addIntsToByteArray(cmds);
     addCrc(ret);
     return ret;
   }
 
-  private byte[] setDriveMtrCmd(int speed, int cmd) {
-    byte[] ret = addIntsToByteArray(new int[]{address, cmd, speed});
+  private ArrayList<byte[]> setDriveMtrCmd(int speed, int cmd) {
+    ArrayList<byte[]> ret = addIntsToByteArray(new int[]{address, cmd, speed});
     addCrc(ret);
     return ret;
   }
 
 
-  private byte[] addIntsToByteArray(int[] ints) {
-    byte[] byteArray = new byte[]{};
+  private ArrayList<byte[]> addIntsToByteArray(int[] ints) {
+    ArrayList<byte[]> arrayList = new ArrayList<>();
     for (int i : ints) {
-      mergeByteArray(byteArray, ByteBuffer.allocate(4).putInt(i).array());
+      arrayList.add(ByteBuffer.allocate(4).putInt(i).array());
     }
-    return byteArray;
-
+    return arrayList;
   }
 
-  private byte[] setPosCmd(int encPos, Cmd m) {
+  private ArrayList<byte[]> setPosCmd(int encPos, Cmd m) {
     //adding values
     int[] ints = new int[]{address, cmds.get(m), accel, speed, deccel, encPos};
-    byte[] ret = addIntsToByteArray(ints);
+    ArrayList<byte[]> ret = addIntsToByteArray(ints);
     //buffer
     addBuffer((byte) 1, ret);
 
@@ -207,33 +207,27 @@ public class RoboClaw {
     return ret;
   }
 
-  private void addCrc(byte[] arrayList) {
-    byte[] bytes = ByteBuffer.allocate(2).putLong(CRC16.calcCrc16(arrayList)).array();
-    mergeByteArray(arrayList,bytes);
+  private void addCrc(ArrayList<byte[]> arrayList) {
+    byte[] bytes = ByteBuffer.allocate(2).putLong(CRC16.crcForCommand(arrayList)).array();
+    arrayList.add(bytes);
   }
 
-  private void addBuffer(byte buffer, byte[] arrayList) {
+  private void addBuffer(byte buffer, ArrayList<byte[]> arrayList) {
     if (buffer == 0 || buffer == 1) {
       byte[] bytes = new byte[]{buffer};
-      mergeByteArray(arrayList,bytes);
+      arrayList.add(bytes);
     } else throw new IllegalArgumentException("buffer must be 0 for buffering or 1 for overriding last command");
   }
 
 
-  private byte[] stopMotor(int cmd) {
+  private ArrayList<byte[]> stopMotor(int cmd) {
     int[] ints = new int[]{address, cmd, 0};
     return getCmdArray(ints);
 
   }
 
-  private byte[] mergeByteArray(byte[] a, byte[] b) {
-    byte[] r = new byte[a.length + b.length];
-    System.arraycopy(a, 0, r, 0, a.length);
-    System.arraycopy(b, 0, r, a.length, b.length);
-    return r;
-  }
 
-  private byte[] generateStopAllCommand() {
+  private ArrayList<byte[]> generateStopAllCommand() {
     int cmd = cmds.get(Cmd.DRIVE_FORWARD);
     int[] ints = new int[]{address, cmd, 0};
     return getCmdArray(ints);
