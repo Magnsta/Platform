@@ -1,4 +1,4 @@
-import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -21,6 +21,8 @@ public class MotorWriter implements Runnable {
     this.FREQ = freq;
     this.box = box;
     resetMotorsAndEncoders();
+    minEnc = 0;
+    maxEnc = 100;
   }
 
   private void startSerialCom() {
@@ -49,22 +51,29 @@ public class MotorWriter implements Runnable {
     }
   }
 
-  private void sendNewMotorPositions(@NotNull int[] newValues) {
+  private void sendNewMotorPositions(int[] newValues) {
     sendM1Pos(newValues[0]);
     sendM2Pos(newValues[1]);
     sendM3Pos(newValues[2]);
   }
 
-  private void sendM1Pos(int encValue) {
-    sendCommandArray(mc1.setPosM1Cmd(encValue));
+  public void sendM1Pos(int encValue) {
+    ArrayList<byte[]> cmd = mc1.setPosM1Cmd(encValue);
+    for(byte[] bs : cmd){
+       System.out.println(ByteBuffer.wrap(bs).getInt());}
+    sendCommandArray(cmd);
   }
 
-  private void sendM2Pos(int encValue) {
-    sendCommandArray(mc1.setPosM2Cmd(encValue));
+  public void sendM2Pos(int encValue) {ArrayList<byte[]> cmd = mc1.setPosM2Cmd(encValue);
+    for(byte[] bs : cmd){
+       System.out.println(ByteBuffer.wrap(bs).getInt());}
+    sendCommandArray(cmd);
   }
 
-  private void sendM3Pos(int encValue) {
-    sendCommandArray(mc2.setPosM1Cmd(encValue));
+  public void sendM3Pos(int encValue) {ArrayList<byte[]> cmd = mc2.setPosM1Cmd(encValue);
+    for(byte[] bs : cmd){
+       System.out.println(ByteBuffer.wrap(bs).getInt());}
+    sendCommandArray(cmd);
   }
 
   private void setMotorPos(int motor, int encValue) {
@@ -105,7 +114,7 @@ public class MotorWriter implements Runnable {
   }
 
 
-  private void resetMotorsAndEncoders() {
+  private void resetMotorsAndEncoders() {/*
     driveM1(-100);
     boolean atEnd = false;
     while (!atEnd) {
@@ -135,7 +144,7 @@ public class MotorWriter implements Runnable {
 
     setMotorPos(1, (int) ((maxEnc - minEnc) / 2));
     setMotorPos(2, (int) ((maxEnc - minEnc) / 2));
-    setMotorPos(3, (int) ((maxEnc - minEnc) / 2));
+    setMotorPos(3, (int) ((maxEnc - minEnc) / 2));*/
   }
 
   private void sendCommand(byte[] cmd) {
@@ -153,10 +162,13 @@ public class MotorWriter implements Runnable {
     }
   }
 
-  private void sendCommandArray(@NotNull ArrayList<byte[]> ba) {
+  private void sendCommandArray(ArrayList<byte[]> ba) {
     for (byte[] bs : ba) {
       sendCommand(bs);
     }
+    try{
+    System.out.println(ser.readLine());}catch(IOException e){
+      System.out.println(e.getMessage());}
   }
 
   /**
@@ -169,7 +181,7 @@ public class MotorWriter implements Runnable {
     return (int) Math.round(projectDouble(motorAngle, maxEnc, minEnc, MotorController.getOperatingAngle()));
   }
 
-  private int[] getEncPositions(@NotNull double[] motorAngels) {
+  private int[] getEncPositions(double[] motorAngels) {
     int[] returnInts = new int[motorAngels.length];
     for (int i = 0; i < motorAngels.length; i++) {
       returnInts[i] = encPosFromAngle(motorAngels[i]);
@@ -177,7 +189,6 @@ public class MotorWriter implements Runnable {
     return returnInts;
   }
 
-  @org.jetbrains.annotations.Contract(pure = true)
   private double projectDouble(double value, int max, int min, double scale) {
     return (value * ((max - min) / scale));
   }
